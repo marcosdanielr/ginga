@@ -1,23 +1,32 @@
-# tools/ — manutenção
+# tools/ — maintenance
+
+## build-dist.sh
+
+Regenerate the dist embedded in the injector after editing `plugin/index.tsx` (or
+after re-finding the flag). Requires `git`, `node`, `pnpm`.
+
+```bash
+tools/build-dist.sh
+cargo build --release --manifest-path injector/Cargo.toml
+```
 
 ## webpack-search.js
 
-Acha a checagem que bloqueia câmera/tela nos módulos Webpack do Discord. Use quando
-o Discord mudar algo e o patch do Ginga parar de funcionar (ex.: renomearam o
-experiment `2026-08-video-guard`).
+Find the check that blocks camera/screen share in Discord's Webpack modules. Use it
+when Discord changes something and the patch stops working (e.g. the
+`2026-08-video-guard` experiment gets renamed).
 
-Passos:
-1. Abra o Discord com Vencord (ou o Vesktop) e o DevTools (`Ctrl+Shift+I`).
-2. Cole todo o conteúdo de `webpack-search.js` no console → imprime `[ginga] pronto`.
-3. Busque a lógica:
+1. Open Discord with Vencord (or Vesktop) and DevTools (`Ctrl+Shift+I`).
+2. Paste all of `webpack-search.js` into the console → prints `[ginga] ready`.
+3. Locate the logic:
    ```js
-   gingaPeek("Camera Unavailable")     // string do tooltip -> tabela i18n
-   gingaGrep("video-guard").map(h=>h.id) // o experiment do guard
-   gingaPeek("videoEnabled", 400)       // consumidores do flag
+   gingaPeek("Camera Unavailable")       // tooltip string -> i18n table
+   gingaGrep("video-guard").map(h => h.id) // the guard experiment
+   gingaPeek("videoEnabled", 400)         // flag consumers
    ```
-4. Confirme o gate ao vivo:
+4. Confirm the gate live:
    ```js
-   gingaWreq(<id>).k.getConfig({location:"test"})   // {videoEnabled:false} no BR
+   gingaWreq(<id>).k.getConfig({ location: "test" })   // {videoEnabled:false} in BR
    ```
-5. Atualize o `find`/`match` em `plugin/index.tsx` (e a cópia embutida nos scripts)
-   e registre em `docs/findings.md`.
+5. Update `find`/`match` in `plugin/index.tsx`, regenerate the dist
+   (`build-dist.sh`), and record it in `docs/findings.md`.

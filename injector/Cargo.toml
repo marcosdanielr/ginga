@@ -1,0 +1,20 @@
+[package]
+name = "ginga-injector"
+version = "0.1.0"
+edition = "2021"
+description = "Single-binary injector: bundles Vencord + the Ginga plugin and patches the official Discord client"
+
+[[bin]]
+name = "ginga"
+path = "src/main.rs"
+
+[dependencies]
+include_dir = "0.7"
+dirs = "5"
+
+[profile.release]
+strip = true
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"

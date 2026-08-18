@@ -1,57 +1,62 @@
 # Ginga
 
-Desbloqueia câmera e compartilhamento de tela do Discord no Brasil, direto no cliente.
+Unblocks Discord camera and screen share in Brazil, directly in the client.
 
-O bloqueio regional é um **experiment client-side** do Discord (`2026-08-video-guard`):
-usuários no BR caem numa variação com `videoEnabled:false`, o que desabilita envio
-**e** recebimento de vídeo. O Ginga é um plugin [Vencord](https://vencord.dev) que,
-no carregamento, força esse flag de volta pra `true`.
+The regional block is a **client-side Discord experiment** (`2026-08-video-guard`):
+users in Brazil are bucketed into a variation with `videoEnabled:false`, which disables
+video **send and receive**. Ginga is a [Vencord](https://vencord.dev) plugin that forces
+that flag back to `true` at module load.
 
-> Os **dois lados** de uma call precisam do Ginga: quem envia e quem recebe. O guard
-> trava vídeo nas duas direções — sem o patch, o outro lado não vê seu vídeo.
+> **Both sides** of a call need Ginga — the sender and the receiver. The guard blocks
+> video in both directions, so without the patch the other side won't see your video.
 
-> ⚠️ Client mods violam os Termos de Serviço do Discord. Risco de ação na conta
-> existe (raro). Cada usuário deve saber disso antes de usar.
+> ⚠️ Client mods violate Discord's Terms of Service. Account action is possible (rare).
+> Everyone using it should know this first.
 
-## Instalação (script)
+## Install — one binary (recommended)
 
-Requer `git`, `node` e `pnpm`. O script clona o Vencord, embute o plugin, builda e
-injeta no seu Discord oficial.
+Download the `ginga` executable for your OS (from the repo's Releases / CI artifacts)
+and run it. It patches the official Discord client. No Node, git, or pnpm needed.
 
-**Linux/macOS:**
+```
+ginga                # inject
+ginga uninstall      # remove
+```
+
+Then: restart Discord, enable **Ginga** in `Settings > Vencord > Plugins`, restart again.
+Run it again if a Discord update ever breaks the patch.
+
+Source and build details: [`injector/`](injector/).
+
+## Install — from source (alternative)
+
+Requires `git`, `node`, `pnpm`. Clones Vencord, embeds the plugin, builds, and injects.
+
 ```bash
-bash install-ginga.sh
+bash install-ginga.sh                                   # Linux/macOS
+powershell -ExecutionPolicy Bypass -File install-ginga.ps1   # Windows
 ```
 
-**Windows (PowerShell):**
-```powershell
-powershell -ExecutionPolicy Bypass -File install-ginga.ps1
-```
-
-Depois: abra o Discord → `Settings → Vencord → Plugins` → ative **Ginga** → reinicie.
-
-Rode o script de novo sempre que um update do Discord quebrar o patch (ele atualiza,
-rebuilda e re-injeta).
-
-## Estrutura
+## Layout
 
 ```
-plugin/index.tsx     # o plugin Vencord (fonte canônica do patch)
-install-ginga.sh     # instalador Linux/macOS (plugin embutido)
-install-ginga.ps1    # instalador Windows (plugin embutido)
-tools/               # webpack-search.js: re-achar a flag se o Discord rotacionar
-docs/findings.md     # análise de onde/como o bloqueio funciona
+injector/            single-binary injector (Rust); bundles the official Vencord CLI + our dist
+plugin/index.tsx     the Vencord plugin (canonical patch source)
+install-ginga.sh     from-source installer (Linux/macOS)
+install-ginga.ps1    from-source installer (Windows)
+tools/build-dist.sh  regenerate the dist embedded in the injector
+tools/webpack-search.js  re-find the flag if Discord rotates it
+docs/findings.md     analysis of how the block works
+.github/workflows/   CI: builds Linux + Windows binaries
 ```
 
-> Os instaladores **embutem** uma cópia de `plugin/index.tsx`. Ao editar o patch,
-> atualize os dois (a fonte e o trecho embutido nos scripts).
+## Planned
 
-## Distribuição alternativa (futuro)
+Custom **Vesktop** build (a standalone client with Ginga baked in) as a second
+distribution option. Not implemented yet.
 
-Empacotar o Ginga num **Vesktop custom** (1 binário, sem `git`/`node` na máquina do
-colega). Ainda não implementado — por hora só a rota script.
+## Maintenance — if the patch stops working
 
-## Manutenção — se o patch parar de funcionar
-
-O Discord pode renomear o experiment. Pra re-achar a flag: abra o DevTools, cole
-`tools/webpack-search.js` no console e siga `tools/README.md` / `docs/findings.md`.
+Discord may rename the experiment. To re-find the flag: open DevTools, paste
+`tools/webpack-search.js` in the console, and follow `tools/README.md` /
+`docs/findings.md`. Update `plugin/index.tsx`, run `tools/build-dist.sh`, rebuild.

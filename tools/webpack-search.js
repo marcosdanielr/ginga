@@ -1,11 +1,9 @@
-// Ginga - Fase 1 (rota DevTools, sem VPN).
-// Cola no console do DevTools do Vesktop/Discord. Procura a checagem de regiao
-// que esconde camera/tela.
+// Ginga - flag finder (DevTools route). Paste into the Vesktop/Discord DevTools
+// console to locate the region check that hides camera/screen share.
 //
-// Se o DevTools bloquear paste: digita  allow pasting  e Enter, depois cola.
+// If DevTools blocks paste: type  allow pasting  and Enter, then paste.
 
 (function () {
-    // Acha o require do Webpack por 2 caminhos (Vencord ou chunk global).
     let wreq;
     try { wreq = Vencord?.Webpack?.wreq; } catch (e) { /* ignore */ }
 
@@ -17,11 +15,11 @@
     }
 
     if (!wreq || !wreq.m) {
-        console.error("[ginga] nao achei o webpack require. Roda:  typeof Vencord, typeof window.webpackChunkdiscord_app");
+        console.error("[ginga] webpack require not found. Try:  typeof Vencord, typeof window.webpackChunkdiscord_app");
         return;
     }
 
-    // grep no source de TODOS os modulos. Retorna [{id, src}].
+    // grep every module's source. Returns [{id, src}].
     function grep(pattern) {
         const re = new RegExp(pattern, "i");
         const hits = [];
@@ -33,15 +31,15 @@
         return hits;
     }
 
-    // mostra so um trecho em volta do match.
+    // print just the slice around each match.
     function peek(pattern, ctx = 200) {
         const re = new RegExp(pattern, "i");
         const hits = grep(pattern);
-        console.log(`[ginga] ${hits.length} modulo(s) batem "${pattern}"`);
+        console.log(`[ginga] ${hits.length} module(s) match "${pattern}"`);
         for (const { id, src } of hits) {
             const m = src.match(re);
             const i = m ? m.index : 0;
-            console.log(`\n--- modulo ${id} ---`);
+            console.log(`\n--- module ${id} ---`);
             console.log(src.slice(Math.max(0, i - ctx), i + ctx));
         }
     }
@@ -49,5 +47,5 @@
     window.gingaGrep = grep;
     window.gingaPeek = peek;
     window.gingaWreq = wreq;
-    console.log(`[ginga] pronto. ${Object.keys(wreq.m).length} modulos. use gingaPeek("Camera Unavailable")`);
+    console.log(`[ginga] ready. ${Object.keys(wreq.m).length} modules. try gingaPeek("Camera Unavailable")`);
 })();
