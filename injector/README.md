@@ -4,8 +4,10 @@ Single self-contained binary that patches the official Discord client with Venco
 + the Ginga plugin. No Node, git, pnpm, or manual steps on the target machine.
 
 It embeds two things and drives them at runtime:
-- `assets/cli/` — the official [Vencord Installer](https://github.com/Vencord/Installer)
-  CLI (does the actual, cross-platform, maintained injection).
+- the official [Vencord Installer](https://github.com/Vencord/Installer) CLI — does the
+  actual, cross-platform, maintained injection. `build.rs` downloads it from a **pinned
+  release tag** and verifies its **SHA-256**, so a moved or tampered "latest" cannot flow
+  into the build. Not committed to the repo.
 - `assets/dist/` — Vencord prebuilt with the Ginga plugin baked in.
 
 On run it extracts both to the user data dir (`~/.local/share/ginga` /
@@ -28,6 +30,8 @@ restart once more.
 ```
 cargo build --release --manifest-path injector/Cargo.toml
 ```
+
+Needs network and `curl` on PATH at build time (to fetch the pinned Vencord CLI).
 
 Windows binaries are produced by CI (`.github/workflows/build.yml`) since this repo's
 dev machine is Linux-only.

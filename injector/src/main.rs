@@ -4,12 +4,8 @@ use include_dir::{include_dir, Dir};
 
 static DIST: Dir = include_dir!("$CARGO_MANIFEST_DIR/assets/dist");
 
-#[cfg(target_os = "linux")]
-const CLI_BYTES: &[u8] = include_bytes!("../assets/cli/VencordInstallerCli-linux");
-#[cfg(target_os = "windows")]
-const CLI_BYTES: &[u8] = include_bytes!("../assets/cli/VencordInstallerCli.exe");
-#[cfg(target_os = "macos")]
-const CLI_BYTES: &[u8] = include_bytes!("../assets/cli/VencordInstaller-macos");
+// Downloaded and checksum-verified by build.rs (pinned Vencord Installer release).
+const CLI_BYTES: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/installer_cli"));
 
 #[cfg(target_os = "windows")]
 const CLI_NAME: &str = "installer.exe";

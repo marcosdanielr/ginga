@@ -12,6 +12,9 @@ path = "src/main.rs"
 include_dir = "0.7"
 dirs = "5"
 
+[build-dependencies]
+sha2 = "0.10"
+
 [profile.release]
 strip = true
 opt-level = "z"
